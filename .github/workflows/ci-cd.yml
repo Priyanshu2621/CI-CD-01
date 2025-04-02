@@ -1,0 +1,34 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Jab bhi main branch me koi update hoga, pipeline chalegi
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Pipeline Ubuntu OS pe chalegi
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2  # Code repo se fetch karega
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # Node.js version set karein
+
+      - name: Install Dependencies
+        run: npm install  # Project dependencies install karega
+
+      - name: Run Tests
+        run: npm test  # Testing karega (Agar aapke pass test cases hain)
+
+      - name: Deploy to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_APP_NAME: "your-heroku-app-name"
+        run: |
+          npm install -g heroku
+          heroku git:remote -a $HEROKU_APP_NAME
+          git push heroku main
